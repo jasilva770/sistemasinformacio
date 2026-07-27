@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planos de Sistemas de Información · Ingeniería Industrial</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<style>
+:root{
+  --bg:#0a2239;--panel:rgba(15,48,87,.72);
+  --ink:#d9ecff;--muted:#8fb3d9;--cyan:#7fd8ff;--amber:#ffb02e;--green:#43e08a;--red:#ff6b6b;
+  --line:rgba(127,216,255,.30);--grid:rgba(127,216,255,.07);--grid2:rgba(127,216,255,.13);
+  --mono:'JetBrains Mono',monospace;--disp:'Big Shoulders Display',sans-serif;--body:'Barlow',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);color:var(--ink);
+  background:
+    radial-gradient(1100px 520px at 85% -8%, rgba(127,216,255,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 40%, rgba(255,176,46,.05), transparent 55%),
+    linear-gradient(var(--grid2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid2) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    var(--bg);
+  background-size:auto,auto,120px 120px,120px 120px,24px 24px,24px 24px,auto;
+  background-attachment:fixed;overflow-x:hidden;
+}
+::selection{background:var(--amber);color:var(--bg)}
+
+.statusbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.55rem 1.4rem;background:rgba(10,34,57,.92);border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;backdrop-filter:blur(6px)}
+.sb-group{display:flex;align-items:center;gap:.6rem;white-space:nowrap}
+.sb-title{font-weight:700;color:var(--cyan);letter-spacing:.18em}
+.led{width:9px;height:9px;border-radius:50%;display:inline-block}
+.led-g{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2.4s infinite}
+.led-a{background:var(--amber);box-shadow:0 0 8px var(--amber);animation:blink 1.6s infinite .4s}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+#clock{color:var(--amber)}
+
+nav{border-bottom:1px solid var(--line);background:rgba(13,43,74,.55)}
+nav ul{display:flex;list-style:none;overflow-x:auto;max-width:1240px;margin:0 auto;padding:0 1.4rem}
+nav a{display:block;padding:.8rem 1.1rem;text-decoration:none;color:var(--muted);font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;white-space:nowrap;border-bottom:2px solid transparent;transition:.25s}
+nav a:hover{color:var(--cyan)} nav a.active{color:var(--amber);border-bottom-color:var(--amber)}
+main{max-width:1240px;margin:0 auto;padding:0 1.4rem}
+
+.panel{position:relative;border:1px solid var(--line);background:var(--panel);padding:1.6rem}
+.panel::before,.panel::after{content:'';position:absolute;width:16px;height:16px;border:2px solid var(--cyan)}
+.panel::before{top:-2px;left:-2px;border-right:none;border-bottom:none}
+.panel::after{bottom:-2px;right:-2px;border-left:none;border-top:none}
+
+/* ══ HERO MEJORADO ══ */
+.hero{padding:3rem 0 2.4rem}
+.hero-top{display:grid;grid-template-columns:minmax(320px,6fr) 6fr;gap:2.5rem;align-items:end;margin-bottom:2rem}
+.kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.22em;color:var(--amber);margin-bottom:1rem}
+.kicker::before{content:'▸ ';color:var(--cyan)}
+h1{font-family:var(--disp);font-weight:900;font-size:clamp(3rem,6.5vw,5.4rem);line-height:.92;text-transform:uppercase}
+h1 .accent{color:var(--amber)}
+.hero-sub{font-family:var(--mono);font-size:.8rem;letter-spacing:.16em;color:var(--cyan);margin-top:1rem;text-transform:uppercase}
+.hero-intro{padding-bottom:.3rem}
+.hero p.lead{color:var(--muted);font-size:1.02rem;line-height:1.65}
+.legend{display:flex;flex-wrap:wrap;gap:1rem;margin:1.1rem 0 1.3rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em}
+.legend span{display:flex;align-items:center;gap:.45rem;color:var(--muted)}
+.dot{width:10px;height:10px;display:inline-block}
+.btn{display:inline-block;font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;padding:.75rem 1.3rem;border:1px solid var(--cyan);color:var(--cyan);text-decoration:none;background:transparent;cursor:pointer;transition:.25s;margin-right:.7rem}
+.btn:hover{background:var(--cyan);color:var(--bg);box-shadow:0 0 18px rgba(127,216,255,.45)}
+.btn.solid{background:var(--amber);border-color:var(--amber);color:var(--bg);font-weight:700}
+.btn.solid:hover{box-shadow:0 0 20px rgba(255,176,46,.55)}
+.pw-label{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;color:var(--muted);margin-bottom:.6rem}
+.pw-label b{color:var(--amber)}
+svg#pipeline{width:100%;height:auto;display:block}
+
+/* estaciones del hero */
+.hnode rect.card{fill:rgba(9,27,47,.96);stroke-width:1.5;transition:.3s;cursor:pointer}
+.hnode:hover rect.card{stroke-width:2.5;filter:drop-shadow(0 0 10px currentColor)}
+.hnode .halo{fill:none;stroke-width:2;opacity:0;transition:opacity .35s}
+.hnode.active .halo{opacity:1;animation:haloPulse 1.1s ease-in-out infinite}
+@keyframes haloPulse{0%,100%{stroke-opacity:.95}50%{stroke-opacity:.25}}
+.hnode .hled{animation:blink 1.9s infinite}
+.hnode.active .hled{animation:blink .5s infinite}
+.hnode text{font-family:var(--mono);pointer-events:none}
+.hnode .hlabel{font-weight:700;font-size:16px;fill:var(--ink)}
+.hnode .hverb{font-size:8.5px;letter-spacing:.16em;fill:var(--muted);text-transform:uppercase}
+.chevrons.fwd{animation:chevFwd 1s linear infinite}
+@keyframes chevFwd{to{transform:translateX(80px)}}
+.chevrons.back{animation:chevBack 1.5s linear infinite}
+@keyframes chevBack{to{transform:translateX(-80px)}}
+.fbelt{animation:beltmove 1.4s linear infinite}
+@keyframes beltmove{to{stroke-dashoffset:-16}}
+.feedback-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;fill:var(--muted)}
+
+.readouts{display:flex;flex-wrap:wrap;border:1px solid var(--line);margin:1.8rem 0 3.5rem}
+.readout{flex:1;min-width:150px;padding:1rem 1.2rem;border-right:1px dashed var(--line);transition:background .3s}
+.readout:last-child{border-right:none}.readout:hover{background:rgba(127,216,255,.06)}
+.readout .val{font-family:var(--mono);font-weight:700;font-size:1.6rem;color:var(--amber)}
+.readout .lbl{font-family:var(--mono);font-size:.65rem;letter-spacing:.16em;color:var(--muted);margin-top:.2rem}
+
+section{scroll-margin-top:90px;margin-bottom:4rem}
+.sec-head{display:flex;align-items:baseline;gap:1.2rem;border-bottom:2px solid var(--line);padding-bottom:.7rem;margin-bottom:1.6rem}
+.sec-num{font-family:var(--disp);font-weight:900;font-size:3.2rem;color:transparent;-webkit-text-stroke:1.5px var(--cyan);line-height:1}
+h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.7rem,3.4vw,2.6rem);text-transform:uppercase}
+h2 small{display:block;font-family:var(--mono);font-weight:400;font-size:.7rem;letter-spacing:.2em;color:var(--amber);margin-top:.3rem}
+
+.station{display:grid;grid-template-columns:250px 1fr;gap:1.6rem}
+.meta{border:1px solid var(--line);background:var(--panel);padding:1.2rem;height:fit-content}
+.meta h4{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--cyan);margin-bottom:.9rem}
+.meta dl{font-size:.85rem}
+.meta dt{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;color:var(--muted);margin-top:.8rem}
+.meta dd{color:var(--ink);font-weight:500;margin-top:.15rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.4rem}
+.chip{font-family:var(--mono);font-size:.62rem;padding:.25rem .55rem;border:1px solid var(--line);color:var(--cyan)}
+.body-col p{color:var(--muted);line-height:1.7;margin-bottom:1rem}
+.body-col p b{color:var(--ink)}
+.hl{background:rgba(255,176,46,.18);padding:.05rem .35rem;border-left:2px solid var(--amber);color:var(--ink)}
+.hl-c{background:rgba(127,216,255,.14);padding:.05rem .35rem;border-left:2px solid var(--cyan);color:var(--ink)}
+
+.diagram{padding:1.2rem 1.2rem 1rem}
+.diagram svg{width:100%;height:auto;display:block}
+.dg-box{fill:rgba(13,43,74,.92);stroke:var(--cyan);stroke-width:1.5;transition:.25s}
+g.dg:hover .dg-box{stroke-width:2.5;filter:drop-shadow(0 0 8px rgba(127,216,255,.55))}
+.dg-amber .dg-box{stroke:var(--amber)} .dg-green .dg-box{stroke:var(--green)} .dg-red .dg-box{stroke:var(--red)}
+.dg-muted .dg-box{stroke:var(--muted)}
+.dg-t{font-family:var(--mono);font-weight:700;font-size:15px;fill:var(--ink)}
+.dg-s{font-family:var(--mono);font-size:10.5px;fill:var(--muted)}
+.dg-xs{font-family:var(--mono);font-size:9px;fill:var(--muted);letter-spacing:.08em}
+.dg-arrow{stroke:var(--cyan);stroke-width:2;fill:none}
+.dg-flow{stroke:var(--cyan);stroke-width:1.4;fill:none;stroke-dasharray:6 8;opacity:.55;animation:beltmove 1s linear infinite}
+.dg-flow.amber{stroke:var(--amber)} .dg-flow.green{stroke:var(--green)}
+.dg-badge circle{fill:var(--bg);stroke-width:1.5}
+.dg-badge text{font-family:var(--mono);font-weight:700;font-size:12px;text-anchor:middle}
+.dg-chip{fill:rgba(7,26,46,.8);stroke:var(--line);stroke-width:1}
+.dg-chip-t{font-family:var(--mono);font-size:9.5px;fill:var(--cyan)}
+.dg-particle{filter:drop-shadow(0 0 5px currentColor)}
+.dg-legend{display:flex;flex-wrap:wrap;gap:1.2rem;margin-top:.9rem;padding-top:.9rem;border-top:1px dashed var(--line);font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:var(--muted)}
+.dg-legend b{color:var(--amber)}
+.scan{animation:scanY 1.6s ease-in-out infinite alternate}
+@keyframes scanY{from{transform:translateY(-16px)}to{transform:translateY(16px)}}
+.gear{animation:spin 8s linear infinite;transform-origin:470px 218px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.sim-how{display:flex;flex-wrap:wrap;align-items:center;gap:1.4rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:var(--muted)}
+.sim-how span b{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid var(--amber);color:var(--amber);margin-right:.5rem;font-weight:700}
+.sim-how .btn{margin-left:auto}
+.sim-grid{display:grid;grid-template-columns:minmax(280px,4fr) 8fr;gap:1.6rem}
+.sim-controls{display:flex;flex-direction:column;gap:.7rem}
+.sim-btn{text-align:left;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:.85rem 1rem;background:transparent;border:1px solid var(--line);color:var(--ink);cursor:pointer;transition:.25s}
+.sim-btn i{margin-right:.6rem;color:var(--cyan)}
+.sim-btn .desc{display:block;font-size:.62rem;color:var(--muted);text-transform:none;letter-spacing:.04em;margin-top:.3rem}
+.sim-btn:hover{border-color:var(--amber);transform:translateX(4px)}
+.sim-btn:disabled{opacity:.4;cursor:wait;transform:none}
+.sim-btn .tag{float:right;color:var(--muted);font-size:.6rem}
+.sim-stage{border:1px solid var(--line);background:var(--panel);padding:1.4rem}
+.sim-pipe{display:flex;align-items:stretch;justify-content:space-between;margin-bottom:1.2rem}
+.sim-node{flex:1;text-align:center;font-family:var(--mono);padding:.7rem .2rem;border:1px solid var(--line);color:var(--muted);position:relative;transition:.3s;background:rgba(7,26,46,.6)}
+.sim-node i{display:block;font-size:1.1rem;margin-bottom:.35rem;color:var(--cyan)}
+.sim-node .nl{font-size:.72rem;letter-spacing:.12em;font-weight:700}
+.sim-node .ns{font-size:.55rem;letter-spacing:.06em;display:block;margin-top:.2rem;opacity:.8}
+.sim-node:not(:first-child)::before{content:'▸';position:absolute;left:-16px;top:50%;transform:translateY(-50%);color:var(--cyan);font-size:.8rem}
+.sim-node+.sim-node{margin-left:26px}
+.sim-node.lit{border-color:var(--amber);color:var(--amber);box-shadow:0 0 16px rgba(255,176,46,.4);background:rgba(255,176,46,.1)}
+.sim-node.lit i{color:var(--amber)}
+.sim-two{display:grid;grid-template-columns:7fr 5fr;gap:1rem}
+#simLog{font-family:var(--mono);font-size:.72rem;line-height:1.8;min-height:170px;max-height:230px;overflow-y:auto;background:#071a2e;border:1px solid var(--line);padding:1rem}
+#simLog .line{opacity:0;animation:lineIn .3s forwards}
+@keyframes lineIn{to{opacity:1}}
+#simLog .ts{color:var(--muted)} #simLog .ok{color:var(--green)} #simLog .inf{color:var(--cyan)} #simLog .wr{color:var(--amber)}
+#simLog .step{color:var(--amber);font-weight:700}
+.sim-explain{background:#071a2e;border:1px solid var(--line);border-left:3px solid var(--amber);padding:1rem}
+.sim-explain h5{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;color:var(--amber);margin-bottom:.6rem}
+.sim-explain p{font-size:.8rem;line-height:1.65;color:var(--ink)}
+.sim-progress{height:3px;background:rgba(127,216,255,.15);margin-top:1rem;overflow:hidden}
+.sim-progress i{display:block;height:100%;width:0;background:var(--amber);transition:width .3s}
+
+.route{display:flex;flex-wrap:wrap;border:1px solid var(--line);margin-top:1.6rem}
+.route-step{flex:1;min-width:170px;padding:1rem 1.1rem;border-right:1px dashed var(--line);transition:background .3s}
+.route-step:last-child{border-right:none}.route-step:hover{background:rgba(127,216,255,.06)}
+.route-step .rn{font-family:var(--disp);font-weight:900;font-size:1.8rem;color:transparent;-webkit-text-stroke:1px var(--amber);line-height:1}
+.route-step .rt{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;color:var(--cyan);margin:.4rem 0 .3rem;font-weight:700}
+.route-step .rd{font-size:.75rem;color:var(--muted);line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{font-family:var(--mono);font-size:.65rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);text-align:left;padding:.8rem;border-bottom:2px solid var(--line)}
+td{padding:.8rem;border-bottom:1px dashed var(--line);color:var(--muted);vertical-align:top}
+td b{color:var(--ink)} tr:hover td{background:rgba(127,216,255,.05);color:var(--ink)}
+
+footer{border-top:2px solid var(--line);margin-top:4rem;background:rgba(7,26,46,.7)}
+.titleblock{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.tb-cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:1rem 1.2rem}
+.tb-cell .k{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;color:var(--muted)}
+.tb-cell .v{font-family:var(--mono);font-size:.85rem;color:var(--amber);margin-top:.3rem}
+.tb-note{max-width:1240px;margin:0 auto;padding:1.2rem 1.4rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:var(--muted)}
+
+@media(max-width:960px){.hero-top,.station,.sim-grid,.sim-two{grid-template-columns:1fr}.sec-num{font-size:2.2rem}.sb-title{display:none}.sim-how .btn{margin-left:0}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <marker id="ahC" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 Z" fill="#7fd8ff"/></marker>
+    <marker id="ahA" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 Z" fill="#ffb02e"/></marker>
+    <marker id="ahG" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 Z" fill="#43e08a"/></marker>
+  </defs>
+</svg>
+
+<header class="statusbar">
+  <div class="sb-group"><span class="led led-g"></span> SISTEMA OPERATIVO</div>
+  <div class="sb-title">SALA DE CONTROL · SISTEMAS DE INFORMACIÓN</div>
+  <div class="sb-group"><span class="led led-a"></span> <span id="clock">--:--:--</span> · 27 JUL 2026 · REV 5.0</div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#base" class="nav-link active">00·TGS</a></li>
+    <li><a href="#tps" class="nav-link">01·TPS</a></li>
+    <li><a href="#mis" class="nav-link">02·MIS</a></li>
+    <li><a href="#dss" class="nav-link">03·DSS</a></li>
+    <li><a href="#erp" class="nav-link">04·ERP</a></li>
+    <li><a href="#crm" class="nav-link">05·CRM</a></li>
+    <li><a href="#simulador" class="nav-link">SIMULADOR</a></li>
+    <li><a href="#arquitectura" class="nav-link">ARQUITECTURA</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ══ HERO : LÍNEA DE PRODUCCIÓN MEJORADA ══ -->
+<section class="hero" id="top">
+  <div class="hero-top">
+    <div>
+      <div class="kicker">PLANO Nº SI-2026-IE-001 · INGENIERÍA INDUSTRIAL</div>
+      <h1>SISTEMAS DE <span class="accent">INFORMACIÓN</span></h1>
+      <div class="hero-sub">// De la Teoría General de Sistemas al ERP y CRM</div>
+    </div>
+    <div class="hero-intro">
+      <p class="lead">Para un ingeniero industrial, los SI no son "software": son el <b>sistema nervioso</b> que convierte los <b>datos</b> del piso de planta en <b>información</b> para decidir, optimizar flujos y reducir la entropía.</p>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--green)"></i> OPERATIVO</span>
+        <span><i class="dot" style="background:var(--amber)"></i> TÁCTICO</span>
+        <span><i class="dot" style="background:var(--cyan)"></i> INTEGRACIÓN</span>
+        <span><i class="dot" style="background:var(--ink)"></i> EXTERNO</span>
+      </div>
+      <a href="#base" class="btn solid">Ver los gráficos ▸</a>
+      <a href="#simulador" class="btn">Operar simulador</a>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="pw-label">VISTA GENERAL — <b>LÍNEA DE PRODUCCIÓN DE INFORMACIÓN</b> · clic en una estación para ir a su detalle · la estación iluminada es el "foco" del flujo</div>
+    <svg id="pipeline" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="bandGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="rgba(127,216,255,.13)"/>
+          <stop offset=".5" stop-color="rgba(127,216,255,.02)"/>
+          <stop offset="1" stop-color="rgba(127,216,255,.13)"/>
+        </linearGradient>
+      </defs>
+      <!-- banda transportadora -->
+      <rect x="28" y="60" width="944" height="110" fill="url(#bandGrad)" stroke="var(--line)" stroke-width="1"/>
+      <g id="chevFwd"></g>
+      <!-- partículas detrás de las estaciones -->
+      <g id="pTop"></g>
+      <path class="ppath" data-layer="pTop" data-color="#7fd8ff" data-interval="550" data-speed="1.9" d="M 40,116 L 960,116" style="stroke:none;fill:none"/>
+      <g id="heroNodes"></g>
+      <!-- retroalimentación -->
+      <path class="fbelt" d="M 900,162 L 900,232 Q 900,240 892,240 L 118,240 Q 110,240 110,232 L 110,162" stroke="var(--amber)" stroke-width="1.5" fill="none" stroke-dasharray="6 8" marker-end="url(#ahA)"/>
+      <g id="chevBack"></g>
+      <path class="ppath" data-color="#ffb02e" data-interval="1500" data-speed="1.2" d="M 900,162 L 900,232 Q 900,240 892,240 L 118,240 Q 110,240 110,232 L 110,162" style="stroke:none;fill:none"/>
+      <text class="feedback-label" x="500" y="262" text-anchor="middle">◂◂ RETROALIMENTACIÓN / FEEDBACK (TGS) — LA INFORMACIÓN REGRESA PARA CORREGIR EL PROCESO ◂◂</text>
+    </svg>
+  </div>
+
+  <div class="readouts reveal">
+    <div class="readout"><div class="val" id="c-tps">0</div><div class="lbl">TRANSACCIONES · TPS</div></div>
+    <div class="readout"><div class="val" id="c-mis">0</div><div class="lbl">REPORTES · MIS</div></div>
+    <div class="readout"><div class="val" id="c-dss">0</div><div class="lbl">ESCENARIOS · DSS</div></div>
+    <div class="readout"><div class="val" id="c-erp">0</div><div class="lbl">PEDIDOS · ERP</div></div>
+    <div class="readout"><div class="val" id="c-crm">0</div><div class="lbl">CLIENTES · CRM</div></div>
+  </div>
+</section>
+
+<!-- ══ 00 · TGS : CORREGIDO — ENTRAN DATOS, SALE INFORMACIÓN ══ -->
+<section id="base">
+  <div class="sec-head reveal"><span class="sec-num">00</span><h2>Teoría General de Sistemas<small>GRÁFICO 00 · DIAGRAMA DE SISTEMAS — ENTRAN DATOS → SALE INFORMACIÓN</small></h2></div>
+  <div class="station">
+    <aside class="meta reveal">
+      <h4>FICHA TÉCNICA</h4>
+      <dl><dt>CÓDIGO</dt><dd>TGS / von Bertalanffy</dd><dt>ROL</dt><dd>Marco lógico de todo SI</dd><dt>REGLA DE ORO</dt><dd>Entran DATOS · sale INFORMACIÓN</dd><dt>HERRAMIENTAS IE</dt><dd><div class="chips"><span class="chip">Flujo de procesos</span><span class="chip">Tiempos y movimientos</span><span class="chip">Kardex</span></div></dd></dl>
+    </aside>
+    <div class="body-col reveal">
+      <p>Un sistema es un <b>conjunto de elementos interrelacionados</b> que trabajan hacia un objetivo. En un sistema de información la regla de oro es: <span class="hl">entran DATOS</span> (crudos, sin contexto) y <span class="hl-c">sale INFORMACIÓN</span> (procesada, con significado para decidir). La retroalimentación usa esa información para corregir las entradas y el proceso.</p>
+      <div class="panel diagram">
+        <div class="pw-label">GRÁFICO 00 — <b>DIAGRAMA DE SISTEMAS (TGS)</b> · pasa el cursor sobre cada bloque</div>
+        <svg viewBox="0 0 920 440" preserveAspectRatio="xMidYMid meet">
+          <rect x="18" y="18" width="884" height="404" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="5 6" opacity=".5"/>
+          <text class="dg-xs" x="32" y="40">ENTORNO (frontera del sistema)</text>
+          <g class="dg"><title>Entradas: datos, materia prima, capital, energía</title>
+            <rect class="dg-box" x="50" y="130" width="180" height="150"/>
+            <text class="dg-t" x="140" y="160" text-anchor="middle">ENTRADAS</text>
+            <text class="dg-s" x="66" y="190">▸ Datos (crudos)</text>
+            <text class="dg-s" x="66" y="210">▸ Materia prima</text>
+            <text class="dg-s" x="66" y="230">▸ Capital</text>
+            <text class="dg-s" x="66" y="250">▸ Energía</text>
+            <g class="dg-badge"><circle cx="58" cy="138" r="13" stroke="var(--amber)"/><text x="58" y="142" fill="var(--amber)">1</text></g>
+          </g>
+          <g class="dg"><title>Proceso de transformación</title>
+            <rect class="dg-box" x="370" y="105" width="200" height="200"/>
+            <text class="dg-t" x="470" y="138" text-anchor="middle">PROCESO DE</text>
+            <text class="dg-t" x="470" y="156" text-anchor="middle">TRANSFORMACIÓN</text>
+            <g class="gear" stroke="var(--cyan)" fill="none">
+              <circle cx="470" cy="218" r="20" stroke-width="3"/><circle cx="470" cy="218" r="7" fill="var(--cyan)" stroke="none"/>
+              <line x1="470" y1="192" x2="470" y2="200" stroke-width="6"/><line x1="470" y1="236" x2="470" y2="244" stroke-width="6"/>
+              <line x1="444" y1="218" x2="452" y2="218" stroke-width="6"/><line x1="488" y1="218" x2="496" y2="218" stroke-width="6"/>
+              <line x1="452" y1="200" x2="458" y2="206" stroke-width="6"/><line x1="482" y1="230" x2="488" y2="236" stroke-width="6"/>
+              <line x1="488" y1="200" x2="482" y2="206" stroke-width="6"/><line x1="458" y1="230" x2="452" y2="236" stroke-width="6"/>
+            </g>
+            <text class="dg-s" x="470" y="272" text-anchor="middle">datos → información</text>
+            <g class="dg-badge"><circle cx="378" cy="113" r="13" stroke="var(--amber)"/><text x="378" y="117" fill="var(--amber)">2</text></g>
+          </g>
+          <g class="dg"><title>Salidas: productos, información, residuos</title>
+            <rect class="dg-box" x="690" y="130" width="180" height="150"/>
+            <text class="dg-t" x="780" y="160" text-anchor="middle">SALIDAS</text>
+            <text class="dg-s" x="706" y="190">▸ Información</text>
+            <text class="dg-s" x="706" y="210">▸ Productos</text>
+            <text class="dg-s" x="706" y="230">▸ Residuos</text>
+            <g class="dg-badge"><circle cx="698" cy="138" r="13" stroke="var(--amber)"/><text x="698" y="142" fill="var(--amber)">3</text></g>
+          </g>
+          <path class="dg-arrow" d="M 232,205 L 362,205" marker-end="url(#ahC)"/>
+          <path class="dg-arrow" d="M 572,205 L 682,205" marker-end="url(#ahC)"/>
+          <path class="dg-flow" d="M 232,205 L 682,205"/>
+          <path class="ppath" data-color="#7fd8ff" data-interval="800" data-speed="1.6" d="M 232,205 L 682,205" style="stroke:none;fill:none"/>
+          <path class="dg-arrow" d="M 780,282 L 780,360 Q 780,375 765,375 L 155,375 Q 140,375 140,360 L 140,288" stroke="var(--amber)" marker-end="url(#ahA)" fill="none"/>
+          <path class="dg-flow amber" d="M 780,282 L 780,360 Q 780,375 765,375 L 155,375 Q 140,375 140,360 L 140,288"/>
+          <path class="ppath" data-color="#ffb02e" data-interval="1300" data-speed="1.3" d="M 780,282 L 780,360 Q 780,375 765,375 L 155,375 Q 140,375 140,360 L 140,288" style="stroke:none;fill:none"/>
+          <text x="470" y="400" text-anchor="middle" font-family="JetBrains Mono" font-size="11" letter-spacing="2" fill="var(--amber)">RETROALIMENTACIÓN / FEEDBACK (información)</text>
+          <g class="dg-badge"><circle cx="320" cy="375" r="13" stroke="var(--amber)"/><text x="320" y="379" fill="var(--amber)">4</text></g>
+        </svg>
+        <div class="dg-legend"><span><b>① ENTRADAS</b> datos + insumos</span><span><b>② PROCESO</b> transformación</span><span><b>③ SALIDAS</b> información + productos</span><span><b>④ RETROALIMENTACIÓN</b> la información regresa</span></div>
+      </div>
+      <p style="margin-top:1rem">La <b>sinergia</b> hace que el todo supere a la suma de las partes; la <b>entropía</b> empuja al desorden y la retroalimentación (④) es la información que reordena el sistema.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 01 · TPS ══ -->
+<section id="tps">
+  <div class="sec-head reveal"><span class="sec-num">01</span><h2>Sistemas de Procesamiento de Transacciones<small>GRÁFICO 01 · TPS — LOS "SENTIDOS" · NIVEL OPERATIVO</small></h2></div>
+  <div class="station">
+    <aside class="meta reveal">
+      <h4>FICHA TÉCNICA</h4>
+      <dl><dt>NIVEL</dt><dd>Operativo (piso de planta)</dd><dt>ENFOQUE</dt><dd>Eficiencia · Precisión · Velocidad</dd><dt>ALIMENTA A</dt><dd>MIS · DSS · ERP</dd><dt>HERRAMIENTAS IE</dt><dd><div class="chips"><span class="chip">RFID</span><span class="chip">Kardex</span><span class="chip">Cód. barras</span></div></dd></dl>
+    </aside>
+    <div class="body-col reveal">
+      <p>Capturan los <b>datos brutos</b> de la operación diaria. <span class="hl">Sin TPS no hay datos; sin datos no hay información.</span></p>
+      <div class="panel diagram">
+        <div class="pw-label">GRÁFICO 01 — <b>CAPTURA TRANSACCIONAL</b></div>
+        <svg viewBox="0 0 920 300" preserveAspectRatio="xMidYMid meet">
+          <g class="dg dg-amber"><title>Evento: operario escanea pallet</title>
+            <rect class="dg-box" x="40" y="90" width="190" height="130"/>
+            <text class="dg-t" x="135" y="118" text-anchor="middle">EVENTO</text>
+            <text class="dg-s" x="135" y="136" text-anchor="middle">Operario escanea pallet</text>
+            <g stroke="var(--ink)" stroke-width="2">
+              <line x1="75" y1="155" x2="75" y2="195"/><line x1="83" y1="155" x2="83" y2="195" stroke-width="4"/>
+              <line x1="93" y1="155" x2="93" y2="195"/><line x1="101" y1="155" x2="101" y2="195" stroke-width="4"/>
+              <line x1="111" y1="155" x2="111" y2="195" stroke-width="3"/><line x1="121" y1="155" x2="121" y2="195"/>
+              <line x1="129" y1="155" x2="129" y2="195" stroke-width="4"/><line x1="141" y1="155" x2="141" y2="195"/>
+              <line x1="149" y1="155" x2="149" y2="195" stroke-width="3"/><line x1="161" y1="155" x2="161" y2="195" stroke-width="4"/>
+              <line x1="173" y1="155" x2="173" y2="195"/><line x1="183" y1="155" x2="183" y2="195" stroke-width="3"/><line x1="195" y1="155" x2="195" y2="195"/>
+            </g>
+            <g class="scan"><line x1="68" y1="175" x2="202" y2="175" stroke="var(--red)" stroke-width="2" style="filter:drop-shadow(0 0 5px var(--red))"/></g>
+          </g>
+          <path class="dg-arrow" d="M 232,155 L 322,155" marker-end="url(#ahC)"/>
+          <g class="dg"><title>TPS registra los campos</title>
+            <rect class="dg-box" x="330" y="70" width="260" height="170"/>
+            <text class="dg-t" x="460" y="100" text-anchor="middle">TPS — REGISTRO</text>
+            <rect class="dg-chip" x="348" y="115" width="105" height="24"/><text class="dg-chip-t" x="400" y="131" text-anchor="middle">ID_Producto</text>
+            <rect class="dg-chip" x="465" y="115" width="105" height="24"/><text class="dg-chip-t" x="517" y="131" text-anchor="middle">Cantidad</text>
+            <rect class="dg-chip" x="348" y="148" width="105" height="24"/><text class="dg-chip-t" x="400" y="164" text-anchor="middle">Hora</text>
+            <rect class="dg-chip" x="465" y="148" width="105" height="24"/><text class="dg-chip-t" x="517" y="164" text-anchor="middle">Operario</text>
+            <rect class="dg-chip" x="406" y="181" width="108" height="24"/><text class="dg-chip-t" x="460" y="197" text-anchor="middle">Línea</text>
+            <text class="dg-xs" x="460" y="226" text-anchor="middle">transacción atómica · ACID</text>
+          </g>
+          <path class="dg-arrow" d="M 592,155 L 690,155" marker-end="url(#ahC)"/>
+          <g class="dg dg-green"><title>Inventario actualizado</title>
+            <ellipse cx="775" cy="115" rx="70" ry="16" class="dg-box"/>
+            <path d="M 705,115 V 195 A 70,16 0 0 0 845,195 V 115" class="dg-box"/>
+            <text class="dg-t" x="775" y="160" text-anchor="middle">INVENTARIO</text>
+            <text class="dg-s" x="775" y="180" text-anchor="middle" fill="var(--green)">✔ actualizado en 12 ms</text>
+          </g>
+          <path class="ppath" data-color="#7fd8ff" data-interval="850" data-speed="1.7" d="M 232,155 L 690,155" style="stroke:none;fill:none"/>
+        </svg>
+        <div class="dg-legend"><span><b>FLUJO</b> — evento físico → dato digital → estado del sistema</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 · MIS ══ -->
+<section id="mis">
+  <div class="sec-head reveal"><span class="sec-num">02</span><h2>Sistemas de Información Gerencial<small>GRÁFICO 02 · MIS — MEMORIA Y CONTROL · NIVEL TÁCTICO</small></h2></div>
+  <div class="station">
+    <aside class="meta reveal">
+      <h4>FICHA TÉCNICA</h4>
+      <dl><dt>NIVEL</dt><dd>Táctico (gerencia media)</dd><dt>PREGUNTA</dt><dd>"¿Qué pasa vs. lo planeado?"</dd><dt>SALIDA</dt><dd>Reportes / KPIs</dd><dt>HERRAMIENTAS IE</dt><dd><div class="chips"><span class="chip">SPC</span><span class="chip">BSC</span><span class="chip">OEE</span></div></dd></dl>
+    </aside>
+    <div class="body-col reveal">
+      <p>Resume miles de transacciones TPS en <b>indicadores accionables</b>. Responde: <em>"¿Vamos según lo planeado?"</em></p>
+      <div class="panel diagram">
+        <div class="pw-label">GRÁFICO 02 — <b>AGREGACIÓN → DASHBOARD OEE</b></div>
+        <svg viewBox="0 0 920 330" preserveAspectRatio="xMidYMid meet">
+          <g class="dg dg-muted"><title>Datos TPS de las líneas</title>
+            <rect class="dg-box" x="45" y="80" width="110" height="42"/><text class="dg-s" x="100" y="106" text-anchor="middle">TPS · Línea 1</text>
+            <rect class="dg-box" x="45" y="140" width="110" height="42"/><text class="dg-s" x="100" y="166" text-anchor="middle">TPS · Línea 2</text>
+            <rect class="dg-box" x="45" y="200" width="110" height="42"/><text class="dg-s" x="100" y="226" text-anchor="middle">TPS · Línea 3</text>
+          </g>
+          <path class="dg-arrow" d="M 157,101 C 230,101 240,150 298,158" marker-end="url(#ahC)"/>
+          <path class="dg-arrow" d="M 157,161 L 298,165" marker-end="url(#ahC)"/>
+          <path class="dg-arrow" d="M 157,221 C 230,221 240,180 298,172" marker-end="url(#ahC)"/>
+          <g class="dg"><title>MIS compila la semana</title>
+            <rect class="dg-box" x="305" y="80" width="215" height="170"/>
+            <text class="dg-t" x="412" y="112" text-anchor="middle">MIS — COMPILACIÓN</text>
+            <text class="dg-s" x="412" y="132" text-anchor="middle">8,412 transacciones / semana</text>
+            <text class="dg-s" x="412" y="160" text-anchor="middle">Σ disponibilidad</text>
+            <text class="dg-s" x="412" y="180" text-anchor="middle">Σ rendimiento</text>
+            <text class="dg-s" x="412" y="200" text-anchor="middle">Σ calidad</text>
+            <text class="dg-xs" x="412" y="228" text-anchor="middle">OEE = D × R × C</text>
+          </g>
+          <path class="dg-arrow" d="M 522,165 L 612,165" marker-end="url(#ahC)"/>
+          <g class="dg"><title>Dashboard OEE</title>
+            <rect class="dg-box" x="620" y="55" width="260" height="220"/>
+            <text class="dg-t" x="750" y="85" text-anchor="middle">DASHBOARD · OEE</text>
+            <path d="M 690,175 A 60,60 0 0 1 810,175" stroke="rgba(127,216,255,.2)" stroke-width="10" fill="none"/>
+            <path id="gfill" d="M 690,175 A 60,60 0 0 1 810,175" stroke="var(--amber)" stroke-width="10" fill="none" stroke-dasharray="0 200" stroke-linecap="round"/>
+            <line x1="792.8" y1="153.2" x2="808.8" y2="145.1" stroke="var(--green)" stroke-width="3"/>
+            <text class="dg-xs" x="816" y="140" fill="var(--green)">META 85%</text>
+            <g id="needleG"><line x1="750" y1="175" x2="750" y2="123" stroke="var(--ink)" stroke-width="3"/><circle cx="750" cy="175" r="5" fill="var(--ink)"/></g>
+            <text x="750" y="218" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="26" fill="var(--amber)">78%</text>
+            <text class="dg-xs" x="750" y="236" text-anchor="middle">OEE REAL · SEMANA 30</text>
+            <text class="dg-xs" x="750" y="258" text-anchor="middle" fill="var(--amber)">▲ Línea 2: 3 paradas no planificadas</text>
+          </g>
+          <path class="ppath" data-color="#7fd8ff" data-interval="950" data-speed="1.5" d="M 157,161 L 612,165" style="stroke:none;fill:none"/>
+        </svg>
+        <div class="dg-legend"><span><b>LECTURA</b> — el gauge se anima al 78% real vs. 85% meta al hacer scroll</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 03 · DSS ══ -->
+<section id="dss">
+  <div class="sec-head reveal"><span class="sec-num">03</span><h2>Sistemas de Soporte a la Decisión<small>GRÁFICO 03 · DSS — EL CEREBRO ANALÍTICO · WHAT-IF</small></h2></div>
+  <div class="station">
+    <aside class="meta reveal">
+      <h4>FICHA TÉCNICA</h4>
+      <dl><dt>NIVEL</dt><dd>Táctico / Estratégico</dd><dt>PREGUNTA</dt><dd>"¿Qué pasaría si…?"</dd><dt>MÉTODOS</dt><dd>Prog. lineal · Montecarlo</dd><dt>HERRAMIENTAS IE</dt><dd><div class="chips"><span class="chip">IO</span><span class="chip">Simulación</span><span class="chip">EOQ</span></div></dd></dl>
+    </aside>
+    <div class="body-col reveal">
+      <p>Usa <b>modelos matemáticos y datos externos</b> para decisiones semi-estructuradas. Evalúa escenarios y recomienda el óptimo.</p>
+      <div class="panel diagram">
+        <div class="pw-label">GRÁFICO 03 — <b>EVALUACIÓN DE ESCENARIOS</b></div>
+        <svg viewBox="0 0 920 330" preserveAspectRatio="xMidYMid meet">
+          <g class="dg dg-amber"><title>Shock externo</title>
+            <rect class="dg-box" x="40" y="110" width="180" height="110"/>
+            <text class="dg-t" x="130" y="145" text-anchor="middle">PROBLEMA</text>
+            <text class="dg-s" x="130" y="170" text-anchor="middle" fill="var(--amber)">Costo litio +20%</text>
+            <text class="dg-xs" x="130" y="192" text-anchor="middle">dato externo de mercado</text>
+          </g>
+          <path class="dg-arrow" d="M 222,165 L 292,165" marker-end="url(#ahC)"/>
+          <g class="dg"><title>DSS ejecuta modelos</title>
+            <rect class="dg-box" x="300" y="70" width="240" height="190"/>
+            <text class="dg-t" x="420" y="100" text-anchor="middle">DSS — MODELOS</text>
+            <rect class="dg-chip" x="320" y="115" width="200" height="24"/><text class="dg-chip-t" x="420" y="131" text-anchor="middle">Programación Lineal</text>
+            <rect class="dg-chip" x="320" y="148" width="200" height="24"/><text class="dg-chip-t" x="420" y="164" text-anchor="middle">Montecarlo ×10,000</text>
+            <rect class="dg-chip" x="320" y="181" width="96" height="24"/><text class="dg-chip-t" x="368" y="197" text-anchor="middle">Variables</text>
+            <rect class="dg-chip" x="424" y="181" width="96" height="24"/><text class="dg-chip-t" x="472" y="197" text-anchor="middle">Restricciones</text>
+            <text class="dg-xs" x="420" y="238" text-anchor="middle">maximizar margen s.a. capacidad</text>
+          </g>
+          <path class="dg-arrow" d="M 542,165 C 580,165 580,105 612,105" marker-end="url(#ahC)" opacity=".45"/>
+          <path class="dg-arrow" d="M 542,165 L 612,165" marker-end="url(#ahG)"/>
+          <path class="dg-arrow" d="M 542,165 C 580,165 580,225 612,225" marker-end="url(#ahC)" opacity=".45"/>
+          <g class="dg dg-red"><title>Escenario A</title><rect class="dg-box" x="620" y="80" width="140" height="50"/><text class="dg-s" x="690" y="100" text-anchor="middle">Escenario A</text><text class="dg-s" x="690" y="118" text-anchor="middle" fill="var(--red)">margen −8%</text></g>
+          <g class="dg dg-green"><title>Escenario B óptimo</title><rect class="dg-box" x="620" y="140" width="140" height="50" stroke-width="2.5"/><text class="dg-s" x="690" y="160" text-anchor="middle">Escenario B ★</text><text class="dg-s" x="690" y="178" text-anchor="middle" fill="var(--green)">margen +12%</text></g>
+          <g class="dg dg-muted"><title>Escenario C</title><rect class="dg-box" x="620" y="200" width="140" height="50"/><text class="dg-s" x="690" y="220" text-anchor="middle">Escenario C</text><text class="dg-s" x="690" y="238" text-anchor="middle">margen +3%</text></g>
+          <path class="dg-arrow" d="M 762,165 L 782,165" marker-end="url(#ahG)"/>
+          <g class="dg dg-green"><title>Decisión recomendada</title>
+            <rect class="dg-box" x="790" y="130" width="120" height="70"/>
+            <text class="dg-t" x="850" y="158" text-anchor="middle" fill="var(--green)">✔ ÓPTIMO</text>
+            <text class="dg-xs" x="850" y="178" text-anchor="middle">Proveedor B</text>
+            <text class="dg-xs" x="850" y="192" text-anchor="middle">EOQ = 500</text>
+          </g>
+          <path class="ppath" data-color="#43e08a" data-interval="1100" data-speed="1.5" d="M 222,165 L 292,165 L 542,165 L 612,165 L 762,165 L 782,165" style="stroke:none;fill:none"/>
+        </svg>
+        <div class="dg-legend"><span><b>RAMAS</b> — A y C se atenúan; la partícula sigue la rama óptima B</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 · ERP ══ -->
+<section id="erp">
+  <div class="sec-head reveal"><span class="sec-num">04</span><h2>Planificación de Recursos Empresariales<small>GRÁFICO 04 · ERP — ORQUESTA LAS 5 ÁREAS FUNCIONALES</small></h2></div>
+  <div class="station">
+    <aside class="meta reveal">
+      <h4>FICHA TÉCNICA</h4>
+      <dl><dt>NIVEL</dt><dd>Integración transversal</dd><dt>PRINCIPIO</dt><dd>Una sola base de datos</dd><dt>5 ÁREAS</dt><dd>Ventas · Operación · Finanzas · Talento Humano · Gerencia</dd><dt>HERRAMIENTAS IE</dt><dd><div class="chips"><span class="chip">MRP II</span><span class="chip">SCM</span><span class="chip">MES</span></div></dd></dl>
+    </aside>
+    <div class="body-col reveal">
+      <p>Toda empresa tiene <b>5 áreas funcionales</b>: <span class="hl">Gerencia, Finanzas, Talento Humano, Operación y Ventas</span>. Sin ERP, cada área trabaja en silos. El ERP las conecta a una <b>sola base de datos</b>: un pedido que entra por Ventas activa a las demás áreas.</p>
+      <div class="panel diagram">
+        <div class="pw-label">GRÁFICO 04 — <b>EL ERP COMO COLUMNA VERTEBRAL DE LAS 5 ÁREAS</b></div>
+        <svg viewBox="0 0 960 400" preserveAspectRatio="xMidYMid meet">
+          <g class="dg dg-amber"><title>Ventas recibe el pedido</title>
+            <rect class="dg-box" x="40" y="177" width="150" height="56"/>
+            <text class="dg-t" x="115" y="200" text-anchor="middle">VENTAS</text>
+            <text class="dg-xs" x="115" y="218" text-anchor="middle">recibe Pedido #7789</text>
+          </g>
+          <path class="dg-arrow" d="M 190,205 L 392,205" stroke="var(--amber)" marker-end="url(#ahA)"/>
+          <path class="dg-flow amber" d="M 190,205 L 392,205"/>
+          <text class="dg-xs" x="291" y="195" text-anchor="middle" fill="var(--amber)">⚡ pedido</text>
+          <g class="dg"><title>ERP integra las 5 áreas</title>
+            <rect class="dg-box" x="400" y="150" width="160" height="110" stroke-width="2.5"/>
+            <rect x="408" y="158" width="144" height="94" fill="none" stroke="var(--cyan)" stroke-width="1" opacity=".4"/>
+            <text class="dg-t" x="480" y="198" text-anchor="middle" font-size="20">ERP</text>
+            <text class="dg-xs" x="480" y="218" text-anchor="middle">BASE DE DATOS ÚNICA</text>
+            <text class="dg-xs" x="480" y="232" text-anchor="middle">integra las 5 áreas</text>
+          </g>
+          <path class="dg-arrow" d="M 480,150 L 480,86" opacity=".7"/>
+          <path class="dg-arrow" d="M 560,160 L 730,108" opacity=".7"/>
+          <path class="dg-arrow" d="M 560,250 L 730,303" opacity=".7"/>
+          <path class="dg-arrow" d="M 480,260 L 480,320" opacity=".7"/>
+          <g class="dg"><title>Gerencia supervisa</title>
+            <rect class="dg-box" x="405" y="30" width="150" height="56"/>
+            <text class="dg-t" x="480" y="53" text-anchor="middle">④ GERENCIA</text>
+            <text class="dg-xs" x="480" y="71" text-anchor="middle">supervisa KPIs · decide</text>
+          </g>
+          <g class="dg dg-amber"><title>Finanzas factura</title>
+            <rect class="dg-box" x="730" y="80" width="170" height="56"/>
+            <text class="dg-t" x="815" y="103" text-anchor="middle">② FINANZAS</text>
+            <text class="dg-xs" x="815" y="121" text-anchor="middle">factura · flujo de caja</text>
+          </g>
+          <g class="dg dg-green"><title>Operación produce</title>
+            <rect class="dg-box" x="730" y="275" width="170" height="56"/>
+            <text class="dg-t" x="815" y="298" text-anchor="middle">① OPERACIÓN</text>
+            <text class="dg-xs" x="815" y="316" text-anchor="middle">produce · MRP · línea</text>
+          </g>
+          <g class="dg"><title>Talento Humano asigna turnos</title>
+            <rect class="dg-box" x="405" y="320" width="150" height="56"/>
+            <text class="dg-t" x="480" y="343" text-anchor="middle">③ TALENTO H.</text>
+            <text class="dg-xs" x="480" y="361" text-anchor="middle">turnos · horas extra</text>
+          </g>
+          <path class="ppath" data-color="#43e08a" data-interval="1300" data-speed="1.4" d="M 560,250 L 730,303" style="stroke:none;fill:none"/>
+          <path class="ppath" data-color="#ffb02e" data-interval="1300" data-speed="1.4" d="M 560,160 L 730,108" style="stroke:none;fill:none"/>
+          <path class="ppath" data-color="#7fd8ff" data-interval="1300" data-speed="1.4" d="M 480,260 L 480,320" style="stroke:none;fill:none"/>
+          <path class="ppath" data-color="#8fb3d9" data-interval="1300" data-speed="1.4" d="M 480,150 L 480,86" style="stroke:none;fill:none"/>
+          <path class="ppath" data-color="#ffb02e" data-interval="900" data-speed="1.8" d="M 190,205 L 392,205" style="stroke:none;fill:none"/>
+        </svg>
+        <div class="dg-legend"><span><b>⚡</b> El pedido entra por <b>VENTAS</b></span><span><b>①</b> Operación produce</span><span><b>②</b> Finanzas factura</span><span><b>③</b> Talento H. asigna turnos</span><span><b>④</b> Gerencia supervisa</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 · CRM ══ -->
+<section id="crm">
+  <div class="sec-head reveal"><span class="sec-num">05</span><h2>Gestión de la Relación con el Cliente<small>GRÁFICO 05 · CRM — CICLO DE ATENCIÓN EN 5 PASOS</small></h2></div>
+  <div class="station">
+    <aside class="meta reveal">
+      <h4>FICHA TÉCNICA</h4>
+      <dl><dt>¿QUÉ ES?</dt><dd>Gestiona TODA la relación con el cliente</dd><dt>MIRADA</dt><dd>Hacia afuera (el ERP mira adentro)</dd><dt>CLAVE</dt><dd>Cierra el ciclo: queja → respuesta</dd><dt>HERRAMIENTAS IE</dt><dd><div class="chips"><span class="chip">TQM</span><span class="chip">Six Sigma</span><span class="chip">Log. inversa</span></div></dd></dl>
+    </aside>
+    <div class="body-col reveal">
+      <p>El CRM es el <b>coordinador de la relación con el cliente</b>: recibe su voz, consulta al ERP para obtener trazabilidad, activa la corrección interna y le responde. <span class="hl">La calidad no termina en la fábrica; termina en la satisfacción del cliente.</span></p>
+      <div class="panel diagram">
+        <div class="pw-label">GRÁFICO 05 — <b>CICLO DE ATENCIÓN AL CLIENTE (5 PASOS)</b></div>
+        <svg viewBox="0 0 960 300" preserveAspectRatio="xMidYMid meet">
+          <g class="dg"><title>Paso 1</title>
+            <rect class="dg-box" x="20" y="100" width="160" height="100"/>
+            <text class="dg-t" x="100" y="130" text-anchor="middle">① CLIENTE</text>
+            <text class="dg-s" x="100" y="152" text-anchor="middle">reporta una falla</text>
+            <text class="dg-xs" x="100" y="170" text-anchor="middle">web · teléfono · tienda</text>
+            <g class="dg-badge"><circle cx="28" cy="108" r="13" stroke="var(--amber)"/><text x="28" y="112" fill="var(--amber)">1</text></g>
+          </g>
+          <path class="dg-arrow" d="M 182,150 L 208,150" marker-end="url(#ahC)"/>
+          <g class="dg"><title>Paso 2</title>
+            <rect class="dg-box" x="210" y="100" width="160" height="100"/>
+            <text class="dg-t" x="290" y="130" text-anchor="middle">② CRM</text>
+            <text class="dg-s" x="290" y="152" text-anchor="middle">registra el caso</text>
+            <text class="dg-xs" x="290" y="170" text-anchor="middle">analiza sentimiento · prioriza</text>
+            <g class="dg-badge"><circle cx="218" cy="108" r="13" stroke="var(--amber)"/><text x="218" y="112" fill="var(--amber)">2</text></g>
+          </g>
+          <path class="dg-arrow" d="M 372,150 L 398,150" marker-end="url(#ahC)"/>
+          <g class="dg"><title>Paso 3</title>
+            <rect class="dg-box" x="400" y="100" width="160" height="100"/>
+            <text class="dg-t" x="480" y="130" text-anchor="middle">③ CRM → ERP</text>
+            <text class="dg-s" x="480" y="152" text-anchor="middle">rastrea el lote</text>
+            <text class="dg-xs" x="480" y="170" text-anchor="middle">lote #L-089 · materia prima</text>
+            <g class="dg-badge"><circle cx="408" cy="108" r="13" stroke="var(--amber)"/><text x="408" y="112" fill="var(--amber)">3</text></g>
+          </g>
+          <path class="dg-arrow" d="M 562,150 L 588,150" marker-end="url(#ahG)"/>
+          <g class="dg dg-green"><title>Paso 4</title>
+            <rect class="dg-box" x="590" y="100" width="160" height="100"/>
+            <text class="dg-t" x="670" y="130" text-anchor="middle">④ ERP → CALIDAD</text>
+            <text class="dg-s" x="670" y="152" text-anchor="middle">acción correctiva</text>
+            <text class="dg-xs" x="670" y="170" text-anchor="middle">Six Sigma en planta</text>
+            <g class="dg-badge"><circle cx="598" cy="108" r="13" stroke="var(--amber)"/><text x="598" y="112" fill="var(--amber)">4</text></g>
+          </g>
+          <path class="dg-arrow" d="M 752,150 L 778,150" marker-end="url(#ahG)"/>
+          <g class="dg dg-green"><title>Paso 5</title>
+            <rect class="dg-box" x="780" y="100" width="160" height="100"/>
+            <text class="dg-t" x="860" y="130" text-anchor="middle">⑤ RESPUESTA</text>
+            <text class="dg-s" x="860" y="152" text-anchor="middle">reemplazo + descuento</text>
+            <text class="dg-xs" x="860" y="170" text-anchor="middle">cliente informado</text>
+            <g class="dg-badge"><circle cx="788" cy="108" r="13" stroke="var(--amber)"/><text x="788" y="112" fill="var(--amber)">5</text></g>
+          </g>
+          <path class="dg-arrow" d="M 860,202 L 860,245 Q 860,260 845,260 L 115,260 Q 100,260 100,245 L 100,208" stroke="var(--green)" marker-end="url(#ahG)" fill="none"/>
+          <path class="dg-flow green" d="M 860,202 L 860,245 Q 860,260 845,260 L 115,260 Q 100,260 100,245 L 100,208"/>
+          <text x="480" y="282" text-anchor="middle" font-family="JetBrains Mono" font-size="11" letter-spacing="2" fill="var(--green)">◂◂ LEALTAD RECUPERADA · EL CICLO SE REPITE ◂◂</text>
+          <path class="ppath" data-color="#ffb02e" data-interval="900" data-speed="1.5" d="M 182,150 L 778,150" style="stroke:none;fill:none"/>
+          <path class="ppath" data-color="#43e08a" data-interval="1600" data-speed="1.2" d="M 860,202 L 860,245 Q 860,260 845,260 L 115,260 Q 100,260 100,245 L 100,208" style="stroke:none;fill:none"/>
+        </svg>
+        <div class="dg-legend"><span><b>IDA</b> — la queja viaja del cliente a la planta (①→④)</span><span><b>RETORNO</b> — la respuesta vuelve al cliente (⑤, lazo verde)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SIMULADOR ══ -->
+<section id="simulador">
+  <div class="sec-head reveal"><span class="sec-num">⚙</span><h2>Simulador de Flujo<small>OPERA LA LÍNEA DE INFORMACIÓN EN TIEMPO REAL</small></h2></div>
+  <div class="panel reveal" style="margin-bottom:1.6rem">
+    <div class="sim-how">
+      <span><b>1</b> Elige una operación</span>
+      <span><b>2</b> Observa qué sistemas se iluminan</span>
+      <span><b>3</b> Lee el registro paso a paso</span>
+      <button class="btn solid" id="demoBtn">▶ Demo automática</button>
+    </div>
+  </div>
+  <div class="sim-grid">
+    <div class="sim-controls reveal">
+      <button class="sim-btn" data-sc="tps"><i class="fas fa-barcode"></i>Escanear pallet <span class="tag">TPS</span><span class="desc">Captura un evento físico y lo vuelve dato.</span></button>
+      <button class="sim-btn" data-sc="mis"><i class="fas fa-file-lines"></i>Reporte OEE <span class="tag">MIS</span><span class="desc">Resume la semana en un indicador vs. meta.</span></button>
+      <button class="sim-btn" data-sc="dss"><i class="fas fa-dice"></i>Simular escenario <span class="tag">DSS</span><span class="desc">Prueba "¿qué pasaría si…?" con modelos.</span></button>
+      <button class="sim-btn" data-sc="erp"><i class="fas fa-cart-shopping"></i>Crear pedido 10k <span class="tag">ERP</span><span class="desc">Activa las 5 áreas funcionales en paralelo.</span></button>
+      <button class="sim-btn" data-sc="crm"><i class="fas fa-triangle-exclamation"></i>Registrar queja <span class="tag">CRM</span><span class="desc">Cierra el ciclo: queja → corrección → respuesta.</span></button>
+    </div>
+    <div class="sim-stage reveal">
+      <div class="sim-pipe">
+        <div class="sim-node" data-i="0"><i class="fas fa-database"></i><span class="nl">TPS</span><span class="ns">captura</span></div>
+        <div class="sim-node" data-i="1"><i class="fas fa-chart-bar"></i><span class="nl">MIS</span><span class="ns">resume</span></div>
+        <div class="sim-node" data-i="2"><i class="fas fa-brain"></i><span class="nl">DSS</span><span class="ns">analiza</span></div>
+        <div class="sim-node" data-i="3"><i class="fas fa-sitemap"></i><span class="nl">ERP</span><span class="ns">integra</span></div>
+        <div class="sim-node" data-i="4"><i class="fas fa-users"></i><span class="nl">CRM</span><span class="ns">responde</span></div>
+      </div>
+      <div class="sim-two">
+        <div id="simLog"><div class="line"><span class="ts">[sistema]</span> <span class="inf">▸ En espera… elige una operación de la izquierda.</span></div></div>
+        <div class="sim-explain">
+          <h5><i class="fas fa-lightbulb"></i> ¿QUÉ ESTÁ PASANDO?</h5>
+          <p id="simExplain">Cada botón dispara un caso real de la fábrica. El registro muestra cada paso y este panel explica, en lenguaje simple, por qué ese sistema es el encargado de esa tarea.</p>
+        </div>
+      </div>
+      <div class="sim-progress"><i id="simBar"></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ ARQUITECTURA ══ -->
+<section id="arquitectura">
+  <div class="sec-head reveal"><span class="sec-num">▦</span><h2>Arquitectura Integrada<small>CÓMO SE CONECTA TODO — LA RUTA DEL DATO</small></h2></div>
+  <div class="panel reveal">
+    <div class="pw-label">VISTA GENERAL — <b>EL DATO NACE EN LA PLANTA Y TERMINA EN EL CLIENTE</b></div>
+    <svg viewBox="0 0 960 430" preserveAspectRatio="xMidYMid meet">
+      <text class="dg-xs" x="480" y="28" text-anchor="middle" fill="var(--cyan)">CAPA DE ANÁLISIS (táctico / estratégico)</text>
+      <g class="dg"><title>MIS resume</title>
+        <rect class="dg-box" x="330" y="40" width="140" height="64"/>
+        <text class="dg-t" x="400" y="68" text-anchor="middle">MIS</text>
+        <text class="dg-xs" x="400" y="88" text-anchor="middle">resume → reportes</text>
+      </g>
+      <g class="dg"><title>DSS analiza</title>
+        <rect class="dg-box" x="500" y="40" width="140" height="64"/>
+        <text class="dg-t" x="570" y="68" text-anchor="middle">DSS</text>
+        <text class="dg-xs" x="570" y="88" text-anchor="middle">analiza → modelos</text>
+      </g>
+      <path class="dg-arrow" d="M 400,104 L 455,193" marker-end="url(#ahC)" opacity=".7"/>
+      <path class="dg-arrow" d="M 570,104 L 545,193" marker-end="url(#ahC)" opacity=".7"/>
+      <text class="dg-xs" x="415" y="150">consultan datos</text>
+      <text class="dg-xs" x="560" y="150">devuelven decisiones</text>
+      <text class="dg-xs" x="480" y="180" text-anchor="middle" fill="var(--amber)">CADENA PRINCIPAL (el dato fluye de izquierda a derecha)</text>
+      <g class="dg dg-muted"><title>Planta</title>
+        <rect class="dg-box" x="30" y="215" width="130" height="70"/>
+        <text class="dg-t" x="95" y="245" text-anchor="middle">PLANTA</text>
+        <text class="dg-xs" x="95" y="265" text-anchor="middle">piso de producción</text>
+      </g>
+      <path class="dg-arrow" d="M 160,250 L 208,250" marker-end="url(#ahC)"/>
+      <text class="dg-xs" x="184" y="240" text-anchor="middle">eventos</text>
+      <g class="dg dg-green"><title>TPS captura</title>
+        <rect class="dg-box" x="210" y="215" width="130" height="70"/>
+        <text class="dg-t" x="275" y="245" text-anchor="middle">TPS</text>
+        <text class="dg-xs" x="275" y="265" text-anchor="middle">captura datos</text>
+      </g>
+      <path class="dg-arrow" d="M 340,250 L 408,250" marker-end="url(#ahC)"/>
+      <text class="dg-xs" x="374" y="240" text-anchor="middle">datos</text>
+      <g class="dg"><title>ERP integra</title>
+        <rect class="dg-box" x="410" y="195" width="180" height="110" stroke-width="2.5"/>
+        <text class="dg-t" x="500" y="240" text-anchor="middle" font-size="18">ERP</text>
+        <text class="dg-xs" x="500" y="260" text-anchor="middle">COLUMNA VERTEBRAL</text>
+        <text class="dg-xs" x="500" y="274" text-anchor="middle">base de datos única</text>
+      </g>
+      <path class="dg-arrow" d="M 590,250 L 658,250" marker-end="url(#ahC)"/>
+      <text class="dg-xs" x="624" y="240" text-anchor="middle">pedidos / estado</text>
+      <g class="dg"><title>CRM conecta</title>
+        <rect class="dg-box" x="660" y="215" width="130" height="70"/>
+        <text class="dg-t" x="725" y="245" text-anchor="middle">CRM</text>
+        <text class="dg-xs" x="725" y="265" text-anchor="middle">gestiona relación</text>
+      </g>
+      <path class="dg-arrow" d="M 790,250 L 838,250" marker-end="url(#ahC)"/>
+      <text class="dg-xs" x="814" y="240" text-anchor="middle">interacciones</text>
+      <g class="dg"><title>Cliente</title>
+        <rect class="dg-box" x="840" y="215" width="100" height="70"/>
+        <text class="dg-t" x="890" y="245" text-anchor="middle">CLIENTE</text>
+        <text class="dg-xs" x="890" y="265" text-anchor="middle">mercado</text>
+      </g>
+      <path class="dg-arrow" d="M 890,287 L 890,375 Q 890,390 875,390 L 110,390 Q 95,390 95,375 L 95,287" stroke="var(--amber)" marker-end="url(#ahA)" fill="none"/>
+      <path class="dg-flow amber" d="M 890,287 L 890,375 Q 890,390 875,390 L 110,390 Q 95,390 95,375 L 95,287"/>
+      <text x="480" y="412" text-anchor="middle" font-family="JetBrains Mono" font-size="11" letter-spacing="2" fill="var(--amber)">◂◂ RETROALIMENTACIÓN — EL CLIENTE RETROALIMENTA A LA PLANTA (TGS) ◂◂</text>
+      <path class="ppath" data-color="#7fd8ff" data-interval="700" data-speed="1.6" d="M 160,250 L 838,250" style="stroke:none;fill:none"/>
+      <path class="ppath" data-color="#ffb02e" data-interval="1800" data-speed="1.2" d="M 890,287 L 890,375 Q 890,390 875,390 L 110,390 Q 95,390 95,375 L 95,287" style="stroke:none;fill:none"/>
+    </svg>
+  </div>
+  <div class="route reveal">
+    <div class="route-step"><div class="rn">1</div><div class="rt">PLANTA → TPS</div><div class="rd">La operación física genera eventos; el TPS los captura como datos.</div></div>
+    <div class="route-step"><div class="rn">2</div><div class="rt">TPS → ERP</div><div class="rd">Los datos entran a la base de datos única del ERP (columna vertebral).</div></div>
+    <div class="route-step"><div class="rn">3</div><div class="rt">ERP ↔ MIS / DSS</div><div class="rd">MIS resume en reportes; DSS analiza escenarios y propone decisiones.</div></div>
+    <div class="route-step"><div class="rn">4</div><div class="rt">ERP → CRM</div><div class="rd">El ERP da trazabilidad; el CRM gestiona la relación con el cliente.</div></div>
+    <div class="route-step"><div class="rn">5</div><div class="rt">CRM → CLIENTE</div><div class="rd">La respuesta llega al cliente y su feedback regresa a la planta.</div></div>
+  </div>
+  <div class="panel reveal" style="margin-top:1.6rem">
+    <div class="pw-label" style="margin-bottom:1rem">CUADRO RESUMEN — <b>ESPECIFICACIONES POR SISTEMA</b></div>
+    <table>
+      <thead><tr><th>Sistema</th><th>Rol en la fábrica</th><th>Nivel</th><th>Pregunta que responde</th><th>Herramienta IE</th></tr></thead>
+      <tbody>
+        <tr><td><b>TGS</b></td><td>Marco lógico</td><td>—</td><td>¿Cómo se interrelacionan las partes?</td><td>Flujo de procesos</td></tr>
+        <tr><td><b>TPS</b></td><td>Sentidos / captura</td><td>Operativo</td><td>¿Qué acaba de pasar?</td><td>RFID · Kardex</td></tr>
+        <tr><td><b>MIS</b></td><td>Memoria / reportes</td><td>Táctico</td><td>¿Vamos según lo planeado?</td><td>SPC · OEE · BSC</td></tr>
+        <tr><td><b>DSS</b></td><td>Cerebro analítico</td><td>Táctico-Estr.</td><td>¿Qué pasaría si…?</td><td>IO · Simulación · EOQ</td></tr>
+        <tr><td><b>ERP</b></td><td>Columna vertebral (5 áreas)</td><td>Integración</td><td>¿Cómo se orquesta todo?</td><td>MRP II · SCM · MES</td></tr>
+        <tr><td><b>CRM</b></td><td>Rostro y oídos</td><td>Integración</td><td>¿Qué necesita el cliente?</td><td>TQM · Six Sigma</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="titleblock">
+    <div class="tb-cell"><div class="k">PROYECTO</div><div class="v">SI · ING. INDUSTRIAL</div></div>
+    <div class="tb-cell"><div class="k">DIBUJÓ</div><div class="v">QWEN-3.8</div></div>
+    <div class="tb-cell"><div class="k">REVISÓ</div><div class="v">DOCENTE IE</div></div>
+    <div class="tb-cell"><div class="k">FECHA</div><div class="v">27 JUL 2026</div></div>
+    <div class="tb-cell"><div class="k">ESCALA</div><div class="v">1:1 · DIGITAL</div></div>
+    <div class="tb-cell"><div class="k">REVISIÓN</div><div class="v">5.0 · DATOS→INFO</div></div>
+    <div class="tb-cell"><div class="k">HOJA</div><div class="v">1 / 1</div></div>
+  </div>
+  <div class="tb-note">MATERIAL PEDAGÓGICO · TGS → TPS → MIS → DSS → ERP → CRM · USO ACADÉMICO LIBRE</div>
+</footer>
+
+<script>
+const ns='http://www.w3.org/2000/svg';
+
+function tickClock(){const n=new Date();document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
+setInterval(tickClock,1000);tickClock();
+
+/* ══ HERO MEJORADO : estaciones con íconos, verbos y LED ══ */
+const HERO=[
+ {id:'tps',label:'TPS',verb:'captura',color:'#43e08a',x:110,icon:'barcode'},
+ {id:'mis',label:'MIS',verb:'resume',color:'#ffb02e',x:268,icon:'chart'},
+ {id:'dss',label:'DSS',verb:'analiza',color:'#ffb02e',x:426,icon:'branch'},
+ {id:'erp',label:'ERP',verb:'integra',color:'#7fd8ff',x:584,icon:'hub'},
+ {id:'crm',label:'CRM',verb:'responde',color:'#7fd8ff',x:742,icon:'person'},
+ {id:'cliente',label:'CLIENTE',verb:'retroalimenta',color:'#d9ecff',x:900,icon:'bag'},
+];
+const ICONS={
+ barcode:c=>`<g stroke="${c}" stroke-width="2"><line x1="-10" y1="-8" x2="-10" y2="8"/><line x1="-5" y1="-8" x2="-5" y2="8" stroke-width="3.5"/><line x1="0" y1="-8" x2="0" y2="8"/><line x1="5" y1="-8" x2="5" y2="8" stroke-width="3.5"/><line x1="10" y1="-8" x2="10" y2="8"/></g>`,
+ chart:c=>`<g fill="${c}"><rect x="-11" y="0" width="6" height="8"/><rect x="-3" y="-7" width="6" height="15"/><rect x="5" y="-3" width="6" height="11"/></g>`,
+ branch:c=>`<g stroke="${c}" stroke-width="2" fill="none"><path d="M 0,8 L 0,0 M 0,0 L -8,-8 M 0,0 L 8,-8"/></g><g fill="${c}"><circle cx="-8" cy="-8" r="2.6"/><circle cx="8" cy="-8" r="2.6"/><circle cx="0" cy="8" r="2.6"/></g>`,
+ hub:c=>`<g stroke="${c}" stroke-width="1.6" fill="none"><path d="M 0,-4 L 0,-9 M 4,0 L 9,0 M 0,4 L 0,9 M -4,0 L -9,0"/><circle cx="0" cy="-9" r="2.6"/><circle cx="9" cy="0" r="2.6"/><circle cx="0" cy="9" r="2.6"/><circle cx="-9" cy="0" r="2.6"/></g><circle cx="0" cy="0" r="4" fill="${c}"/>`,
+ person:c=>`<g fill="${c}"><circle cx="0" cy="-5" r="4.2"/><path d="M -7.5,9 Q 0,-2 7.5,9 Z"/></g>`,
+ bag:c=>`<g stroke="${c}" stroke-width="2" fill="none"><rect x="-7" y="-3" width="14" height="12"/><path d="M -4,-3 Q -4,-9 0,-9 Q 4,-9 4,-3"/></g>`
+};
+const hg=document.getElementById('heroNodes');
+HERO.forEach(n=>{
+  const g=document.createElementNS(ns,'g');
+  g.setAttribute('class','hnode');g.style.color=n.color;
+  g.innerHTML=`
+    <rect class="halo" x="${n.x-66}" y="68" width="132" height="96" stroke="${n.color}"/>
+    <rect class="card" x="${n.x-62}" y="72" width="124" height="88" stroke="${n.color}"/>
+    <circle class="hled" cx="${n.x+48}" cy="82" r="3.5" fill="${n.color}"/>
+    <g transform="translate(${n.x},98)">${ICONS[n.icon](n.color)}</g>
+    <text class="hlabel" x="${n.x}" y="136" text-anchor="middle">${n.label}</text>
+    <text class="hverb" x="${n.x}" y="152" text-anchor="middle">${n.verb}</text>`;
+  g.addEventListener('click',()=>document.getElementById(n.id==='cliente'?'crm':n.id).scrollIntoView({behavior:'smooth'}));
+  hg.appendChild(g);
+});
+
+/* chevrones de flujo (ida y retorno) */
+function makeChevrons(id,y,color,cls){
+  const g=document.getElementById(id);let d='';
+  for(let x=-80;x<=1040;x+=80){d+=`M ${x},${y-6} L ${x+8},${y} L ${x},${y+6} `;}
+  g.innerHTML=`<path d="${d}" stroke="${color}" stroke-width="2" fill="none" opacity=".45"/>`;
+  g.setAttribute('class',cls);
+}
+makeChevrons('chevFwd',116,'#7fd8ff','chevrons fwd');
+makeChevrons('chevBack',240,'#ffb02e','chevrons back');
+
+/* estación activa que recorre la línea */
+const hnodes=[...document.querySelectorAll('.hnode')];
+let activeI=0;
+setInterval(()=>{
+  hnodes.forEach(n=>n.classList.remove('active'));
+  hnodes[activeI].classList.add('active');
+  activeI=(activeI+1)%hnodes.length;
+},1600);
+
+/* ══ MOTOR DE PARTÍCULAS UNIVERSAL ══ */
+const flows=[...document.querySelectorAll('.ppath')].map(p=>({
+  path:p,len:p.getTotalLength(),
+  parent:p.dataset.layer?document.getElementById(p.dataset.layer):p.ownerSVGElement,
+  color:p.dataset.color||'#ffb02e',interval:+(p.dataset.interval||900),speed:+(p.dataset.speed||1.6),parts:[]
+}));
+function spawnP(f){
+  const c=document.createElementNS(ns,'circle');
+  c.setAttribute('r',4);c.setAttribute('fill',f.color);c.setAttribute('class','dg-particle');c.style.color=f.color;
+  f.parent.appendChild(c);f.parts.push({el:c,d:0,sp:f.speed*(0.85+Math.random()*0.4)});
+}
+flows.forEach(f=>{spawnP(f);setInterval(()=>spawnP(f),f.interval);});
+(function loop(){
+  flows.forEach(f=>{for(let i=f.parts.length-1;i>=0;i--){
+    const p=f.parts[i];p.d+=p.sp;
+    if(p.d>=f.len){p.el.remove();f.parts.splice(i,1);continue;}
+    const pt=f.path.getPointAtLength(p.d);p.el.setAttribute('cx',pt.x);p.el.setAttribute('cy',pt.y);
+  }});
+  requestAnimationFrame(loop);
+})();
+
+gsap.registerPlugin(ScrollTrigger);
+gsap.utils.toArray('.reveal').forEach(el=>{
+  gsap.from(el,{y:40,opacity:0,duration:.8,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 88%'}});
+});
+/* entrada escalonada de las estaciones del hero */
+gsap.from('.hnode',{y:34,opacity:0,duration:.7,stagger:.12,ease:'power3.out',delay:.3});
+
+const gfill=document.getElementById('gfill');
+gsap.to({v:0},{v:147,duration:1.6,ease:'power2.out',
+  onUpdate:function(){gfill.setAttribute('stroke-dasharray',this.targets()[0].v+' 200');},
+  scrollTrigger:{trigger:'#mis',start:'top 70%',once:true}});
+gsap.set('#needleG',{rotation:-90,transformOrigin:'750px 175px'});
+gsap.to('#needleG',{rotation:50.4,transformOrigin:'750px 175px',duration:1.6,ease:'power2.out',
+  scrollTrigger:{trigger:'#mis',start:'top 70%',once:true}});
+
+const counters={tps:1240,mis:36,dss:14,erp:88,crm:512};
+function renderCounters(){for(const k in counters)document.getElementById('c-'+k).textContent=counters[k].toLocaleString('es');}
+renderCounters();
+setInterval(()=>{counters.tps+=Math.ceil(Math.random()*7);if(Math.random()>.6)counters.crm++;renderCounters();},1200);
+
+const links=[...document.querySelectorAll('.nav-link')];
+const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+window.addEventListener('scroll',()=>{
+  let idx=0;secs.forEach((s,i)=>{if(s&&window.scrollY>=s.offsetTop-150)idx=i;});
+  links.forEach((a,i)=>a.classList.toggle('active',i===idx));
+});
+
+/* ══ SIMULADOR ══ */
+const simLog=document.getElementById('simLog'),simBar=document.getElementById('simBar');
+const simExplain=document.getElementById('simExplain');
+const simNodes=[...document.querySelectorAll('.sim-node')];
+const SCENARIOS={
+  tps:{n:[0],inc:'tps',
+    explain:"El lector captura un evento físico (un pallet que pasa por la línea) y lo convierte en un registro digital con ID, cantidad, hora, operario y línea. Este DATO es la materia prima de todos los demás sistemas: sin él, el MIS no tiene qué resumir ni el ERP qué integrar.",
+    lines:[['inf','▸ Lector RFID detecta pallet #A-4471 en Línea 3…'],['inf','▸ [TPS] Registrando: ID · Cantidad(120) · Hora · Operario · Línea'],['ok','✔ [TPS] Inventario actualizado en 12 ms. Transacción confirmada.']]},
+  mis:{n:[0,1],inc:'mis',
+    explain:"El MIS agrupa las 8,412 transacciones de la semana y las resume en UN indicador: el OEE. Lo compara contra la meta (85%) y detecta que la Línea 2 está al 78%. El jefe de planta no lee miles de registros: solo ve dónde actuar.",
+    lines:[['inf','▸ [MIS] Compilando 8,412 transacciones TPS de la semana…'],['inf','▸ [MIS] Calculando OEE = Disponibilidad × Rendimiento × Calidad'],['wr','▲ [MIS] Desviación: Línea 2 → 78% (meta 85%)'],['ok','✔ [MIS] Dashboard enviado al jefe de planta. Foco: Línea 2.']]},
+  dss:{n:[2],inc:'dss',
+    explain:"Ante un cambio externo (el litio subió 20%) no hay respuesta obvia. El DSS prueba miles de escenarios con modelos matemáticos y recomienda la mejor decisión: proveedor B y lote económico de 500 unidades.",
+    lines:[['wr','▲ [DSS] Shock externo: costo del litio +20%'],['inf','▸ [DSS] Ejecutando Montecarlo (10,000 iteraciones)…'],['inf','▸ [DSS] Evaluando mezcla de materiales y rutas…'],['ok','✔ [DSS] Óptimo: Proveedor B + EOQ=500 → margen máximo.']]},
+  erp:{n:[3],inc:'erp',
+    explain:"Un pedido entra por VENTAS y el ERP lo orquesta en paralelo: ① OPERACIÓN produce, ② FINANZAS factura, ③ TALENTO HUMANO asigna turnos y ④ GERENCIA supervisa los KPIs. Todo con UNA sola base de datos, sin silos.",
+    lines:[['inf','▸ [VENTAS→ERP] Pedido #7789: 10,000 baterías recibido.'],['inf','▸ [① OPERACIÓN] MRP reserva materia prima · programa Línea 1'],['inf','▸ [② FINANZAS] Factura proforma + flujo de caja actualizado'],['inf','▸ [③ TALENTO HUMANO] Turno nocturno reforzado con horas extra'],['ok','✔ [④ GERENCIA] KPIs del pedido visibles en el tablero. Sincronización total.']]},
+  crm:{n:[4,3],inc:'crm',
+    explain:"Una queja entra al CRM (①②). El CRM consulta al ERP para rastrear el lote (③), el ERP activa la corrección en planta con Six Sigma (④), y el CRM responde al cliente con reemplazo y descuento (⑤). El ciclo se cierra y la lealtad se recupera.",
+    lines:[['wr','▲ [① CLIENTE] Reporta falla en lote #L-089 (sentimiento: negativo)'],['inf','▸ [② CRM] Registra caso · analiza sentimiento · prioriza'],['inf','▸ [③ CRM→ERP] Rastrea lote → identifica materia prima'],['inf','▸ [④ ERP→CALIDAD] Acción correctiva Six Sigma en planta'],['ok','✔ [⑤ RESPUESTA] Reemplazo + descuento programados. Lealtad recuperada.']]}
+};
+let simBusy=false;
+function logLine(cls,txt){
+  const t=new Date().toTimeString().slice(0,8);
+  const div=document.createElement('div');div.className='line';
+  div.innerHTML=`<span class="ts">[${t}]</span> <span class="${cls}">${txt}</span>`;
+  simLog.appendChild(div);simLog.scrollTop=simLog.scrollHeight;
+}
+function runScenario(key){
+  if(simBusy)return;simBusy=true;
+  const sc=SCENARIOS[key],btns=[...document.querySelectorAll('.sim-btn')];
+  btns.forEach(b=>b.disabled=true);
+  simLog.innerHTML='';simBar.style.width='0%';
+  simNodes.forEach(n=>n.classList.remove('lit'));
+  simExplain.textContent=sc.explain;
+  const total=sc.lines.length;
+  sc.lines.forEach((ln,i)=>{
+    setTimeout(()=>{
+      logLine(ln[0],`<span class="step">Paso ${i+1}/${total}</span> ${ln[1]}`);
+      sc.n.forEach(idx=>simNodes[idx].classList.add('lit'));
+      simBar.style.width=((i+1)/total*100)+'%';
+      if(i===total-1){
+        counters[sc.inc]+=1;renderCounters();
+        setTimeout(()=>{simNodes.forEach(n=>n.classList.remove('lit'));btns.forEach(b=>b.disabled=false);simBusy=false;},900);
+      }
+    },(i+1)*700);
+  });
+}
+document.querySelectorAll('.sim-btn').forEach(b=>b.addEventListener('click',()=>runScenario(b.dataset.sc)));
+document.getElementById('demoBtn').addEventListener('click',async()=>{
+  const order=['tps','mis','dss','erp','crm'];
+  for(const k of order){
+    runScenario(k);
+    await new Promise(r=>setTimeout(r,(SCENARIOS[k].lines.length+1)*700+600));
+  }
+});
+</script>
+</body>
+</html>
